@@ -2,27 +2,27 @@ const API_URL = '/api/customers';
 let editMode = false;
 let currentEditId = null;
 
-// Opens and closes the extra stats section at the top of the table
+// This opens and closes the Bristol stats panel at the top of the table
 function toggleStats() {
     const panel = document.getElementById('statsPanel');
     panel.classList.toggle('hidden');
 }
 
-// Helper to check if the user entered valid information
+// Our cafe's rules for valid data entry
 function validateInput(name, email, age) {
-    // Name must be at least 3 characters
+    // Name check
     if (name.length <= 2) {
         alert("Name must be more than 2 characters.");
         return false;
     }
 
-    // Email must have an @ symbol and be at least 5 characters long
+    // Email check (must have @ and be long enough)
     if (email.length <= 4 || !email.includes("@")) {
         alert("Please add a valid email.");
         return false;
     }
 
-    // Age must be a number between 5 and 105
+    // Age check (between 5 and 105)
     const ageNum = parseInt(age);
     if (isNaN(ageNum) || ageNum < 5 || ageNum > 105) {
         alert("Age must be between 5 and 105.");
@@ -32,30 +32,29 @@ function validateInput(name, email, age) {
     return true;
 }
 
-// Fetches the latest customer list from the server and updates the page
+// Pulls the customer list from the database and fills the table
 async function fetchCustomers() {
     try {
         const res = await fetch(API_URL);
         let data = await res.json();
 
-        // Sort by ID so the list stays in order
+        // Sort the list so IDs stay in order
         data.sort((a, b) => a.id - b.id);
 
         const tableBody = document.getElementById('customerTableBody');
         tableBody.innerHTML = '';
 
-        // Calculate data for the "More Info" dashboard
+        // Calculate the stats for the "More Info" dashboard
         const total = data.length;
         const avgAge = total > 0
             ? (data.reduce((sum, c) => sum + c.age, 0) / total).toFixed(1)
             : 0;
 
-        // Update the visual badges and stats labels
-        document.getElementById('customerCount').innerText = `${total} Active Records`;
+        // Update the numbers in the hidden stats panel
         document.getElementById('totalStat').innerText = total;
         document.getElementById('avgAgeStat').innerText = avgAge;
 
-        // Create the HTML for each table row
+        // Loop through the data and create the table rows
         data.forEach(c => {
             const customerData = JSON.stringify(c).replace(/"/g, '&quot;');
             tableBody.innerHTML += `
@@ -75,11 +74,11 @@ async function fetchCustomers() {
                 </tr>`;
         });
     } catch (err) {
-        console.error("Error loading customers:", err);
+        console.error("Could not fetch customers:", err);
     }
 }
 
-// Takes a customer's details and puts them back into the form for editing
+// Fills the form with an existing customer's data so we can edit it
 function prepareEdit(customer) {
     editMode = true;
     currentEditId = customer.id;
@@ -88,7 +87,6 @@ function prepareEdit(customer) {
     document.getElementById('email').value = customer.email;
     document.getElementById('age').value = customer.age;
 
-    // Show the cancel button and change the submit button to orange
     document.getElementById('cancelBtn').classList.remove('hidden');
 
     const btn = document.getElementById('submitBtn');
@@ -96,17 +94,17 @@ function prepareEdit(customer) {
     btn.classList.replace('bg-blue-600', 'bg-orange-500');
     btn.classList.replace('hover:bg-blue-700', 'hover:bg-orange-600');
 
-    // Smoothly scroll to the top so the user sees the form
+    // Scroll back to the top so the user sees the form is ready
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Handles saving new customers or updating existing ones
+// Decides to either Save a new customer or Update an existing one
 async function handleSubmit() {
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const age = document.getElementById('age').value;
 
-    // Only proceed if all validation rules pass
+    // Stop here if the data is invalid
     if (!validateInput(name, email, age)) return;
 
     const payload = { name, email, age: parseInt(age) };
@@ -126,11 +124,11 @@ async function handleSubmit() {
             fetchCustomers();
         }
     } catch (err) {
-        console.error("Error saving customer:", err);
+        console.error("Save failed:", err);
     }
 }
 
-// Clears the form and switches the UI back to "Add" mode
+// Resets the form and puts the button back to blue "Add" mode
 function resetForm() {
     editMode = false;
     currentEditId = null;
@@ -147,17 +145,17 @@ function resetForm() {
     btn.classList.replace('hover:bg-orange-600', 'hover:bg-blue-700');
 }
 
-// Deletes a customer after getting a quick confirmation
+// Deletes a customer after a quick pop-up confirmation
 async function deleteCustomer(id) {
-    if (confirm("Are you sure you want to remove this customer?")) {
+    if (confirm("Permanently delete this customer record?")) {
         try {
             const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
             if (response.ok) fetchCustomers();
         } catch (err) {
-            console.error("Error deleting customer:", err);
+            console.error("Delete failed:", err);
         }
     }
 }
 
-// Run the fetch function once when the page first loads
+// Load the customer list when the page opens
 fetchCustomers();

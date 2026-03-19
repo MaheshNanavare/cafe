@@ -2,69 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Main background setup for the whole page */
+/* Main page setup to fill the whole screen with the pattern */
 .cafe-dashboard-bg {
     background-color: #f3f4f6;
-    /* This points to your cafe pattern image in the images folder */
+    /* Ensure this path points to your actual .jpg file */
     background-image: url('../images/cafe-pattern.jpg');
     background-repeat: repeat;
-    background-size: 200px;
+    /* Adjust this number to make the pattern icons larger or smaller */
+    background-size: 250px;
+    /* This locks the background in place while you scroll the table */
     background-attachment: fixed;
-    /* A soft fade-in when the page first loads */
+    /* Forces the background to always be at least the height of the screen */
+    min-height: 100vh;
     animation: fadeIn 0.5s ease-in-out;
 }
 
 @layer components {
-    /* Style for the main white boxes (cards) */
+    /* Style for the semi-transparent glass cards */
     .kiosk-card {
-        @apply rounded-2xl shadow-2xl border border-gray-200/50 transition-all duration-300;
-        /* This creates the 85% transparency you requested */
+        /* overflow-hidden is what makes the table corners look smooth and rounded */
+        @apply rounded-2xl shadow-2xl border border-gray-200/50 transition-all duration-300 overflow-hidden;
+        /* This is the 85% transparency setting */
         background-color: rgba(255, 255, 255, 0.85);
-        /* This blurs the background pattern behind the card to make text easier to read */
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
+        /* Frosted glass effect so the pattern doesn't distract from the text */
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
     }
 
-    /* Styles for the text boxes where users type info */
+    /* Input field styling - kept solid white for perfect readability */
     .input-field {
         @apply mt-1 border-2 border-gray-100 p-3 rounded-xl w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all;
-        /* We keep these solid white so the text inside is always clear */
         background-color: #ffffff;
     }
 
-    /* Main blue button style */
+    /* Main blue action button */
     .btn-primary {
         @apply bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 font-bold shadow-lg shadow-blue-200 transition-all active:scale-95;
     }
 
-    /* Blue text link for the Edit action */
+    /* Blue text for Edit buttons */
     .btn-edit {
         @apply text-blue-600 hover:text-blue-800 font-bold transition-colors;
     }
 
-    /* Red text link for the Delete action */
+    /* Red text for Delete buttons */
     .btn-delete {
         @apply text-red-500 hover:text-red-700 font-bold transition-colors;
     }
 }
 
-/* Ensures the text in the table rows is dark and easy to see */
+/* High-contrast text for the table data */
 #customerTableBody tr td {
-    @apply text-gray-900 font-medium;
+    @apply text-gray-900 font-bold;
 }
 
-/* The animation logic for the page fade-in */
+/* Smooth fade-in effect when the page loads */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* Customizing the scrollbar to look modern and thin */
+/* Modern, thin scrollbar that fits the glass theme */
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(0,0,0,0.05);
 }
 ::-webkit-scrollbar-thumb {
     @apply bg-gray-400/50 rounded-full hover:bg-gray-500;
