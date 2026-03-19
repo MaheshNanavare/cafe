@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cafe Kiosk Management</title>
+    <title>Cafe Kiosk Management | Bristol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="cafe-dashboard-bg min-h-screen">
 
 <div class="w-full h-48 bg-cover bg-center shadow-inner relative" style="background-image: url('https://images.unsplash.com/photo-1501339819358-ee5969a2f243?q=80&w=1000&auto=format&fit=crop');">
-    <div class="w-full h-full bg-black/40 flex items-center justify-center">
+    <div class="w-full h-full bg-black/40 flex items-center justify-center text-center">
         <h1 class="text-4xl font-extrabold text-white tracking-tight drop-shadow-lg">☕ Cafe Kiosk System</h1>
     </div>
 </div>
@@ -25,19 +25,19 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
             <div>
                 <label class="text-xs font-bold text-gray-500 uppercase">Full Name</label>
-                <input id="name" type="text" placeholder="John Doe" class="input-field">
+                <input id="name" type="text" placeholder="Min 3 chars" class="input-field">
             </div>
             <div>
                 <label class="text-xs font-bold text-gray-500 uppercase">Email Address</label>
-                <input id="email" type="email" placeholder="john@example.com" class="input-field">
+                <input id="email" type="email" placeholder="example@mail.com" class="input-field">
             </div>
             <div>
                 <label class="text-xs font-bold text-gray-500 uppercase">Age</label>
-                <input id="age" type="number" placeholder="25" class="input-field">
+                <input id="age" type="number" placeholder="5 - 105" class="input-field">
             </div>
             <div class="flex flex-col gap-2">
                 <button id="submitBtn" onclick="handleSubmit()" class="btn-primary">
-                    Add/Update Customer
+                    Add Customer
                 </button>
                 <button id="cancelBtn" onclick="resetForm()" class="hidden text-red-500 text-xs font-bold uppercase tracking-wider hover:text-red-700 text-center transition-all">
                     ✖ Cancel Edit
@@ -48,13 +48,27 @@
 
     <div class="kiosk-card overflow-hidden">
         <div class="p-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-            <h3 class="font-bold text-gray-700">Recent Customers</h3>
-            <span id="customerCount" class="text-xs font-bold bg-blue-100 text-blue-600 px-3 py-1 rounded-full uppercase">
-                    Active Records
+                <span id="customerCount" class="text-xs font-bold bg-blue-100 text-blue-600 px-3 py-1 rounded-full uppercase tracking-wider">
+                    0 Active Records
                 </span>
+            <button onclick="toggleStats()" class="text-xs font-bold text-blue-600 hover:text-blue-800 uppercase flex items-center gap-1 transition-colors">
+                📊 More Info
+            </button>
         </div>
+
+        <div id="statsPanel" class="hidden bg-white/60 p-6 border-b border-gray-100 text-gray-700 grid grid-cols-2 gap-4">
+            <div class="border-r border-gray-100">
+                <p class="text-gray-500 uppercase text-[10px] font-bold tracking-widest mb-1">Total Customers</p>
+                <p id="totalStat" class="text-2xl font-black text-blue-600">0</p>
+            </div>
+            <div>
+                <p class="text-gray-500 uppercase text-[10px] font-bold tracking-widest mb-1">Average Age</p>
+                <p id="avgAgeStat" class="text-2xl font-black text-blue-600">0</p>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
-            <table class="w-full text-left">
+            <table class="w-full text-left border-collapse">
                 <thead class="bg-gray-50/80 border-b border-gray-100">
                 <tr>
                     <th class="p-5 text-xs font-bold text-gray-400 uppercase">ID</th>
@@ -70,8 +84,8 @@
         </div>
     </div>
 
-    <footer class="mt-8 text-center text-gray-400 text-sm pb-8">
-        &copy; 2026 Cafe Management Kiosk &bull; Built with Spring Boot & Tailwind
+    <footer class="mt-8 text-center text-gray-500 text-sm pb-8 flex items-center justify-center gap-2">
+        Cafe Management Kiosk • Built in 📍 Bristol
     </footer>
 </div>
 

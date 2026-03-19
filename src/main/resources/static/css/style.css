@@ -2,50 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Main background setup for the whole page */
 .cafe-dashboard-bg {
-    background-color: #f9fafb;
-    background-image: url('../images/cafe-pattern.png');
+    background-color: #f3f4f6;
+    /* This points to your cafe pattern image in the images folder */
+    background-image: url('../images/cafe-pattern.jpg');
     background-repeat: repeat;
-    background-size: 180px;
+    background-size: 200px;
     background-attachment: fixed;
-    animation: fadeIn 0.8s ease-in-out;
+    /* A soft fade-in when the page first loads */
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 @layer components {
+    /* Style for the main white boxes (cards) */
     .kiosk-card {
-        @apply bg-white rounded-2xl shadow-xl border border-gray-100 transition-all duration-300;
+        @apply rounded-2xl shadow-2xl border border-gray-200/50 transition-all duration-300;
+        /* This creates the 85% transparency you requested */
+        background-color: rgba(255, 255, 255, 0.85);
+        /* This blurs the background pattern behind the card to make text easier to read */
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
     }
 
+    /* Styles for the text boxes where users type info */
     .input-field {
         @apply mt-1 border-2 border-gray-100 p-3 rounded-xl w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all;
+        /* We keep these solid white so the text inside is always clear */
+        background-color: #ffffff;
     }
 
+    /* Main blue button style */
     .btn-primary {
         @apply bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 font-bold shadow-lg shadow-blue-200 transition-all active:scale-95;
     }
 
+    /* Blue text link for the Edit action */
     .btn-edit {
-        @apply text-blue-500 hover:text-blue-700 font-bold transition-colors;
+        @apply text-blue-600 hover:text-blue-800 font-bold transition-colors;
     }
 
+    /* Red text link for the Delete action */
     .btn-delete {
-        @apply text-red-400 hover:text-red-600 font-bold transition-colors;
+        @apply text-red-500 hover:text-red-700 font-bold transition-colors;
     }
 }
 
+/* Ensures the text in the table rows is dark and easy to see */
+#customerTableBody tr td {
+    @apply text-gray-900 font-medium;
+}
+
+/* The animation logic for the page fade-in */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
+/* Customizing the scrollbar to look modern and thin */
 ::-webkit-scrollbar {
     width: 6px;
 }
-
 ::-webkit-scrollbar-track {
     background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+    @apply bg-gray-400/50 rounded-full hover:bg-gray-500;
 }
