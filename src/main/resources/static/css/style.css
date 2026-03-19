@@ -2,73 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Main page setup to fill the whole screen with the pattern */
+/* 1. Main Background: Fills the screen, no tiling */
 .cafe-dashboard-bg {
     background-color: #f3f4f6;
-    /* Ensure this path points to your actual .jpg file */
+    /* This points to your cafe pattern, kept fixed so it doesn't scroll */
     background-image: url('../images/cafe-pattern.jpg');
-    background-repeat: repeat;
-    /* Adjust this number to make the pattern icons larger or smaller */
-    background-size: 250px;
-    /* This locks the background in place while you scroll the table */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
-    /* Forces the background to always be at least the height of the screen */
-    min-height: 100vh;
-    animation: fadeIn 0.5s ease-in-out;
+    animation: fadeIn 0.8s ease-out;
 }
 
 @layer components {
-    /* Style for the semi-transparent glass cards */
+    /* 2. Glass Cards: 85% transparency + Blur */
     .kiosk-card {
-        /* overflow-hidden is what makes the table corners look smooth and rounded */
-        @apply rounded-2xl shadow-2xl border border-gray-200/50 transition-all duration-300 overflow-hidden;
-        /* This is the 85% transparency setting */
+        /* overflow-hidden clips the internal table corners to keep them smooth */
+        @apply rounded-2xl shadow-2xl border border-white/20 transition-all duration-300 overflow-hidden;
         background-color: rgba(255, 255, 255, 0.85);
-        /* Frosted glass effect so the pattern doesn't distract from the text */
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 
-    /* Input field styling - kept solid white for perfect readability */
+    /* Input fields: White and clean for high contrast */
     .input-field {
-        @apply mt-1 border-2 border-gray-100 p-3 rounded-xl w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all;
-        background-color: #ffffff;
+        @apply mt-1 border border-gray-200 p-3 rounded-xl w-full focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all;
+        background-color: rgba(255, 255, 255, 0.95);
     }
 
-    /* Main blue action button */
+    /* Buttons */
     .btn-primary {
         @apply bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 font-bold shadow-lg shadow-blue-200 transition-all active:scale-95;
     }
 
-    /* Blue text for Edit buttons */
     .btn-edit {
-        @apply text-blue-600 hover:text-blue-800 font-bold transition-colors;
+        @apply text-blue-600 hover:text-blue-800 font-bold transition-colors text-sm uppercase tracking-wide;
     }
 
-    /* Red text for Delete buttons */
     .btn-delete {
-        @apply text-red-500 hover:text-red-700 font-bold transition-colors;
+        @apply text-red-500 hover:text-red-700 font-bold transition-colors text-sm uppercase tracking-wide;
     }
 }
 
-/* High-contrast text for the table data */
+/* 3. Browser-Safe Special Font for Bristol Footer */
+.browser-safe-special-font {
+    /* Georgia and Times New Roman are available on almost all desktop and mobile systems */
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    font-weight: 600;
+}
+
+/* 4. Table Smoothing & Visibility */
 #customerTableBody tr td {
-    @apply text-gray-900 font-bold;
+    @apply text-gray-800 font-medium py-4;
 }
 
-/* Smooth fade-in effect when the page loads */
+/* Removes the bottom border of the very last row so it fits the card's rounded curve perfectly */
+#customerTableBody tr:last-child {
+    border-bottom: none;
+}
+
+/* 5. Smooth Fade-in animation for the whole UI */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Modern, thin scrollbar that fits the glass theme */
+/* 6. Modern thin scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.1);
 }
 ::-webkit-scrollbar-thumb {
-    @apply bg-gray-400/50 rounded-full hover:bg-gray-500;
+    @apply bg-gray-400/40 rounded-full hover:bg-gray-500/60;
 }

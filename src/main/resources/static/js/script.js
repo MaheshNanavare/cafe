@@ -1,111 +1,101 @@
 const API_URL = '/api/customers';
+let allCustomers = []; // Stores the full list so we can search instantly
 let editMode = false;
 let currentEditId = null;
 
-// This opens and closes the Bristol stats panel at the top of the table
+// 1. Fetch data from the database
+async function fetchCustomers() {
+    try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+
+        // Sort by ID to keep the table organized, then save to global variable
+        allCustomers = data.sort((a, b) => a.id - b.id);
+
+        // Draw the table
+        renderTable(allCustomers);
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+}
+
+// 2. The Live Search Logic
+function filterCustomers() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+    // Filter the global array based on name or email
+    const filtered = allCustomers.filter(c =>
+        c.name.toLowerCase().includes(searchTerm) ||
+        c.email.toLowerCase().includes(searchTerm)
+    );
+
+    // Redraw the table with only the matches
+    renderTable(filtered);
+}
+
+// 3. Toggle the Stats Panel
 function toggleStats() {
     const panel = document.getElementById('statsPanel');
     panel.classList.toggle('hidden');
 }
 
-// Our cafe's rules for valid data entry
-function validateInput(name, email, age) {
-    // Name check
-    if (name.length <= 2) {
-        alert("Name must be more than 2 characters.");
-        return false;
+// 4. Render Table and Update Dynamic Stats
+function renderTable(customerList) {
+    const tableBody = document.getElementById('customerTableBody');
+    tableBody.innerHTML = '';
+
+    // Calculate real-time stats
+    const total = customerList.length;
+    const avgAge = total > 0
+        ? (customerList.reduce((sum, c) => sum + c.age, 0) / total).toFixed(1)
+        : 0;
+
+    // Update the UI text
+    document.getElementById('totalStat').innerText = total;
+    document.getElementById('avgAgeStat').innerText = avgAge;
+
+    // Update the badge next to the search bar
+    document.getElementById('customerCount').innerText = `${total} Active Records`;
+
+    // Handle empty search results
+    if (customerList.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-400 italic">No customers found.</td></tr>`;
+        return;
     }
 
-    // Email check (must have @ and be long enough)
-    if (email.length <= 4 || !email.includes("@")) {
-        alert("Please add a valid email.");
-        return false;
-    }
+    // Build the table rows
+    customerList.forEach(c => {
+        // Escape quotes so we can pass the object safely to the edit function
+        const customerData = JSON.stringify(c).replace(/"/g, '&quot;');
 
-    // Age check (between 5 and 105)
-    const ageNum = parseInt(age);
-    if (isNaN(ageNum) || ageNum < 5 || ageNum > 105) {
-        alert("Age must be between 5 and 105.");
-        return false;
-    }
-
-    return true;
+        tableBody.innerHTML += `
+            <tr class="hover:bg-blue-50/30 transition-all border-b border-gray-50 last:border-0">
+                <td class="p-5 font-mono text-xs text-gray-400">#${c.id}</td>
+                <td class="p-5 font-bold text-gray-800">${c.name}</td>
+                <td class="p-5 text-gray-600 text-sm">${c.email}</td>
+                <td class="p-5 text-center">
+                    <span class="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold text-gray-500">${c.age}</span>
+                </td>
+                <td class="p-5 text-center">
+                    <div class="flex justify-center gap-4">
+                        <button onclick="prepareEdit(${customerData})" class="btn-edit">Edit</button>
+                        <button onclick="deleteCustomer(${c.id})" class="btn-delete">Delete</button>
+                    </div>
+                </td>
+            </tr>`;
+    });
 }
 
-// Pulls the customer list from the database and fills the table
-async function fetchCustomers() {
-    try {
-        const res = await fetch(API_URL);
-        let data = await res.json();
-
-        // Sort the list so IDs stay in order
-        data.sort((a, b) => a.id - b.id);
-
-        const tableBody = document.getElementById('customerTableBody');
-        tableBody.innerHTML = '';
-
-        // Calculate the stats for the "More Info" dashboard
-        const total = data.length;
-        const avgAge = total > 0
-            ? (data.reduce((sum, c) => sum + c.age, 0) / total).toFixed(1)
-            : 0;
-
-        // Update the numbers in the hidden stats panel
-        document.getElementById('totalStat').innerText = total;
-        document.getElementById('avgAgeStat').innerText = avgAge;
-
-        // Loop through the data and create the table rows
-        data.forEach(c => {
-            const customerData = JSON.stringify(c).replace(/"/g, '&quot;');
-            tableBody.innerHTML += `
-                <tr class="hover:bg-blue-50/30 transition-colors">
-                    <td class="p-5 font-mono text-gray-400">#${c.id}</td>
-                    <td class="p-5 font-bold text-gray-800">${c.name}</td>
-                    <td class="p-5 text-gray-600">${c.email}</td>
-                    <td class="p-5 text-center">
-                        <span class="bg-gray-100/50 px-3 py-1 rounded-full text-sm font-medium text-gray-600">${c.age}</span>
-                    </td>
-                    <td class="p-5 text-center">
-                        <div class="flex justify-center gap-4">
-                            <button onclick="prepareEdit(${customerData})" class="btn-edit">Edit</button>
-                            <button onclick="deleteCustomer(${c.id})" class="btn-delete">Delete</button>
-                        </div>
-                    </td>
-                </tr>`;
-        });
-    } catch (err) {
-        console.error("Could not fetch customers:", err);
-    }
-}
-
-// Fills the form with an existing customer's data so we can edit it
-function prepareEdit(customer) {
-    editMode = true;
-    currentEditId = customer.id;
-
-    document.getElementById('name').value = customer.name;
-    document.getElementById('email').value = customer.email;
-    document.getElementById('age').value = customer.age;
-
-    document.getElementById('cancelBtn').classList.remove('hidden');
-
-    const btn = document.getElementById('submitBtn');
-    btn.innerText = "Update Customer";
-    btn.classList.replace('bg-blue-600', 'bg-orange-500');
-    btn.classList.replace('hover:bg-blue-700', 'hover:bg-orange-600');
-
-    // Scroll back to the top so the user sees the form is ready
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// Decides to either Save a new customer or Update an existing one
+// 5. Add or Update a Customer
 async function handleSubmit() {
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const age = document.getElementById('age').value;
 
-    // Stop here if the data is invalid
-    if (!validateInput(name, email, age)) return;
+    if (!name || !email || !age) {
+        alert("Please fill in all fields.");
+        return;
+    }
 
     const payload = { name, email, age: parseInt(age) };
 
@@ -121,14 +111,30 @@ async function handleSubmit() {
 
         if (response.ok) {
             resetForm();
-            fetchCustomers();
+            fetchCustomers(); // Refresh the list from the database
         }
     } catch (err) {
-        console.error("Save failed:", err);
+        console.error("Save error:", err);
     }
 }
 
-// Resets the form and puts the button back to blue "Add" mode
+// 6. Prepare the form for editing
+function prepareEdit(customer) {
+    editMode = true;
+    currentEditId = customer.id;
+
+    document.getElementById('name').value = customer.name;
+    document.getElementById('email').value = customer.email;
+    document.getElementById('age').value = customer.age;
+
+    document.getElementById('cancelBtn').classList.remove('hidden');
+    document.getElementById('submitBtn').innerText = "Update Record";
+
+    // Smoothly scroll back up to the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 7. Reset the form back to "Add" mode
 function resetForm() {
     editMode = false;
     currentEditId = null;
@@ -138,24 +144,20 @@ function resetForm() {
     document.getElementById('age').value = '';
 
     document.getElementById('cancelBtn').classList.add('hidden');
-
-    const btn = document.getElementById('submitBtn');
-    btn.innerText = "Add Customer";
-    btn.classList.replace('bg-orange-500', 'bg-blue-600');
-    btn.classList.replace('hover:bg-orange-600', 'hover:bg-blue-700');
+    document.getElementById('submitBtn').innerText = "Add Customer";
 }
 
-// Deletes a customer after a quick pop-up confirmation
+// 8. Delete a Customer
 async function deleteCustomer(id) {
-    if (confirm("Permanently delete this customer record?")) {
+    if (confirm("Are you sure you want to delete this record?")) {
         try {
-            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-            if (response.ok) fetchCustomers();
+            await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            fetchCustomers(); // Refresh the list
         } catch (err) {
-            console.error("Delete failed:", err);
+            console.error("Delete error:", err);
         }
     }
 }
 
-// Load the customer list when the page opens
+// 9. Initialize the app on page load
 fetchCustomers();
