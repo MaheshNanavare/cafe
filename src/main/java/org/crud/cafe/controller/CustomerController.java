@@ -7,7 +7,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
-@CrossOrigin(origins = "*") // Allows frontend to talk to backend
+@CrossOrigin(origins = "*")
 public class CustomerController {
     private final CustomerRepository repository;
 
@@ -23,6 +23,21 @@ public class CustomerController {
     @PostMapping
     public Customer create(@RequestBody Customer customer) {
         return repository.save(customer);
+    }
+
+    @PutMapping("/{id}")
+    public Customer update(@PathVariable Long id, @RequestBody Customer updatedCustomer) {
+        return repository.findById(id)
+                .map(customer -> {
+                    customer.setName(updatedCustomer.getName());
+                    customer.setEmail(updatedCustomer.getEmail());
+                    customer.setAge(updatedCustomer.getAge());
+                    return repository.save(customer);
+                })
+                .orElseGet(() -> {
+                    updatedCustomer.setId(id);
+                    return repository.save(updatedCustomer);
+                });
     }
 
     @DeleteMapping("/{id}")
