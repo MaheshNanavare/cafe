@@ -1,7 +1,7 @@
-package com.cafe.controller;
+package org.crud.cafe.controller;
 
-import com.cafe.model.Customer;
-import com.cafe.repository.CustomerRepository;
+import org.crud.cafe.model.Customer;
+import org.crud.cafe.repository.CustomerRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 

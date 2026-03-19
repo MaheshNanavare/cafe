@@ -1,4 +1,4 @@
-package com.cafe.model;
+package org.crud.cafe.model;
 
 import jakarta.persistence.*;
 
@@ -6,16 +6,18 @@ import jakarta.persistence.*;
 @Table(name = "customers")
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Sequential ID
     private Long id;
     private String name;
     private String email;
+    private int age;
 
     public Customer() {}
 
-    public Customer(String name, String email) {
+    public Customer(String name, String email, int age) {
         this.name = name;
         this.email = email;
+        this.age = age;
     }
 
     // Getters and Setters
@@ -25,4 +27,6 @@ public class Customer {
     public void setName(String name) { this.name = name; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
 }
