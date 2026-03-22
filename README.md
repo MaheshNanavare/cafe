@@ -8,6 +8,10 @@ https://cafe-service-dqh6.onrender.com/
 
 I chose to host both the application and the PostgreSQL database in the cloud to ensure the system is accessible from any device, rather than just running on a local computer.
 
+### Dashboard Overview
+![Bristol Cafe Kiosk Dashboard](assets/dashboard-screenshot.png)
+*The main dashboard interface featuring a customer registration bar, an expandable information section, and a dynamic customer data table with real-time search filtering.*
+
 ## Tech Stack
 - Backend: Java 17, Spring Boot, Spring Data JPA
 - Frontend: HTML5, Tailwind CSS, JavaScript (Fetch API)
